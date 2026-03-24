@@ -1,10 +1,13 @@
 [build]
   functions = "netlify/functions"
 
-  [functions]
-    node_bundler = "esbuild"
+[functions]
+  node_bundler = "esbuild"
 
-    [[redirects]]
-      from = "/api/claude"
-        to = "/.netlify/functions/claude"
-          status = 200
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/api/claude"
+  to = "/.netlify/functions/claude"
+  status = 200

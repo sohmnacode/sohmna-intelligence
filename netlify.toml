@@ -1,0 +1,10 @@
+[build]
+  functions = "netlify/functions"
+
+  [functions]
+    node_bundler = "esbuild"
+
+    [[redirects]]
+      from = "/api/claude"
+        to = "/.netlify/functions/claude"
+          status = 200

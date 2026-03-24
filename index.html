@@ -197,12 +197,12 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
     </div>
     <input type="file" id="fi" accept="audio/*" style="display:none">
     <div class="ww" id="ww"><div class="wl">WAVEFORM PREVIEW</div><canvas id="wc" style="width:100%;height:52px;display:block"></canvas></div>
-    <button class="abtn" id="abtn" onclick="analyze()">ANALYZE DNA &rarr;</button>
+    <button class="abtn" id="abtn" onclick="analyze()">ANALYZE RESONANCE &rarr;</button>
     <div class="lw" id="lw"><div class="lt" id="lt">SCANNING...</div><div class="lb"><div class="lf"></div></div></div>
 
     <div class="res" id="res">
       <div>
-        <div class="sh">AUDIO DNA</div>
+        <div class="sh">AUDIO RESONANCE</div>
         <div class="dc"><div class="dg" id="dg"></div><div class="tags" id="dtags"></div></div>
       </div>
       <div>
@@ -233,7 +233,7 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
       <button class="rtab" onclick="stab('sr',this)">SEARCH</button>
       <button class="rtab" onclick="stab('sl',this)">SOUNDS LIKE</button>
       <button class="rtab" onclick="stab('gn',this)">GENRES</button>
-      <button class="rtab" onclick="stab('gp',this)">MAP</button>
+      <button class="rtab" onclick="stab('gp',this)">RESONANCE</button>
       <button class="rtab" onclick="stab('fv',this)">SAVED</button>
       <button class="rtab" onclick="stab('dg2',this)">DIG</button>
     </div>
@@ -275,7 +275,7 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
 
       <!-- DNA MAP -->
       <div class="tp2" id="tab-gp">
-        <div class="sh">DNA CONNECTION MAP</div>
+        <div class="sh">RESONANCE MAP</div>
         <div class="gw"><canvas id="gc" style="width:100%;height:220px;display:block"></canvas></div>
         <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--t2);flex-wrap:wrap">
           <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a);margin-right:4px;vertical-align:middle"></span>Your track</span>
@@ -439,10 +439,10 @@ function analyze(){
   var btn=document.getElementById('abtn');btn.disabled=true;btn.textContent='ANALYZING...';
   document.getElementById('lw').classList.add('v');document.getElementById('res').classList.remove('v');
   document.getElementById('pnotes-wrap').style.display='none';
-  var steps=['SCANNING FINGERPRINT...','DETECTING BPM & KEY...','ANALYZING HARMONICS...','QUERYING SAMPLE DB...','TRACING DNA...','GENERATING INSIGHTS...'];
+  var steps=['SCANNING FINGERPRINT...','DETECTING BPM & KEY...','ANALYZING HARMONICS...','QUERYING SAMPLE DB...','TRACING RESONANCE...','GENERATING INSIGHTS...'];
   var si=0,iv=setInterval(function(){if(si<steps.length)document.getElementById('lt').textContent=steps[si++];},900);
   var name=_file.name.replace(/\.[^.]+$/,''),mb=(_file.size/1024/1024).toFixed(1);
-  var prompt='You are an expert music analyst and crate digger. Track: "'+name+'" ('+mb+'MB). Return ONLY valid JSON, no markdown:\n{"bpm":"92-96","key":"Fm","era":"1970s","genre_tags":["Soul","Funk"],"mood_tags":["Melancholic","Groove"],"sonic_tags":["Dusty","Warm"],"analysis":"2-3 sentence sonic DNA description.","chop_bpm":88,"chop_key":"Fm","compatible_keys":["Ab","Cm","Bb"],"flip_tip":"One sentence on how to flip this for a beat.","matches":[{"title":"Song","artist":"Artist","year":"1972","type":"original","reason":"One sentence."},{"title":"Song2","artist":"Artist2","year":"1994","type":"sibling","reason":"One sentence."},{"title":"Song3","artist":"Artist3","year":"1998","type":"flip","reason":"One sentence."},{"title":"Song4","artist":"Artist4","year":"2001","type":"sibling","reason":"One sentence."}]}';
+  var prompt='You are an expert music analyst and crate digger. Track: "'+name+'" ('+mb+'MB). Return ONLY valid JSON, no markdown:\n{"bpm":"92-96","key":"Fm","era":"1970s","genre_tags":["Soul","Funk"],"mood_tags":["Melancholic","Groove"],"sonic_tags":["Dusty","Warm"],"analysis":"2-3 sentence sonic resonance description.","chop_bpm":88,"chop_key":"Fm","compatible_keys":["Ab","Cm","Bb"],"flip_tip":"One sentence on how to flip this for a beat.","matches":[{"title":"Song","artist":"Artist","year":"1972","type":"original","reason":"One sentence."},{"title":"Song2","artist":"Artist2","year":"1994","type":"sibling","reason":"One sentence."},{"title":"Song3","artist":"Artist3","year":"1998","type":"flip","reason":"One sentence."},{"title":"Song4","artist":"Artist4","year":"2001","type":"sibling","reason":"One sentence."}]}';
   apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
     clearInterval(iv);document.getElementById('lw').classList.remove('v');
     if(err){toast('Error: '+err.message);btn.disabled=false;btn.textContent='RE-ANALYZE';return;}
@@ -633,7 +633,7 @@ function doSearch(){
   var q=document.getElementById('search-input').value.trim();if(!q)return;
   var status=document.getElementById('search-status'),results=document.getElementById('search-results');
   status.style.display='block';status.innerHTML='<span class="spin"></span> SEARCHING...';results.innerHTML='';
-  var prompt='Expert music historian. User searching: "'+q+'". Return ONLY valid JSON:\n{"artist":"Name","description":"1-2 sentences on sample legacy.","known_for":["tag1","tag2"],"originals":[{"title":"T","artist":"A","year":"1972","reason":"Why."}],"sampled_by":[{"title":"T","artist":"A","year":"1993","reason":"Why."},{"title":"T2","artist":"A2","year":"1997","reason":"Why."}],"siblings":[{"title":"T","artist":"A","year":"1975","reason":"Similar DNA."}]}';
+  var prompt='Expert music historian. User searching: "'+q+'". Return ONLY valid JSON:\n{"artist":"Name","description":"1-2 sentences on sample legacy.","known_for":["tag1","tag2"],"originals":[{"title":"T","artist":"A","year":"1972","reason":"Why."}],"sampled_by":[{"title":"T","artist":"A","year":"1993","reason":"Why."},{"title":"T2","artist":"A2","year":"1997","reason":"Why."}],"siblings":[{"title":"T","artist":"A","year":"1975","reason":"Similar resonance."}]}';
   apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
     status.style.display='none';
     if(err){results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Error: '+err.message+'</div>';return;}
@@ -657,7 +657,7 @@ function doSearch(){
       }
       addSection('SAMPLED FROM',p.originals);
       addSection('SAMPLED BY',p.sampled_by);
-      addSection('SIMILAR DNA',p.siblings);
+      addSection('SIMILAR RESONANCE',p.siblings);
     }catch(e){results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Could not parse results.</div>';}
   });
 }

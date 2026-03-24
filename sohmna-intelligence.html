@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRATE — Sample Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--s1:#111;--s2:#1a1a1a;--s3:#222;--b:rgba(255,255,255,0.08);--bh:rgba(255,255,255,0.18);--a:#c8f04d;--a2:#f04d8a;--a3:#4dc8f0;--t:#f0ede8;--t2:#888880;--t3:#555550}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* HEADER */
+header{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--b);flex-wrap:wrap}
+.logo{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--a);letter-spacing:.12em}
+.logo span{color:var(--t3);font-size:11px;margin-left:8px}
+#key-wrap{display:flex;align-items:center;gap:8px;flex:1;max-width:420px}
+#apikey{flex:1;background:var(--s1);border:1px solid var(--b);border-radius:6px;padding:8px 12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--t);outline:none;min-width:0}
+#apikey:focus{border-color:rgba(200,240,77,0.5)}
+#keyst{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap}
+
+/* LAYOUT */
+main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
+.left{padding:24px;border-right:1px solid var(--b);display:flex;flex-direction:column;gap:18px;overflow-y:auto}
+.right{display:flex;flex-direction:column;height:calc(100vh - 57px);position:sticky;top:57px}
+
+/* DROP ZONE */
+.drop{border:1px dashed var(--bh);border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;background:var(--s1);transition:all .2s;position:relative;overflow:hidden}
+.drop::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(200,240,77,0.04) 0%,transparent 70%);pointer-events:none}
+.drop.over{border-color:var(--a);background:rgba(200,240,77,0.04)}
+.drop.has{border-style:solid;border-color:var(--a)}
+.di{width:52px;height:52px;border-radius:50%;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:20px;transition:all .2s}
+.drop.has .di{background:rgba(200,240,77,0.1);border-color:var(--a)}
+.dt{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.06em;margin-bottom:4px}
+.ds{font-size:12px;color:var(--t2);line-height:1.5}
+.df{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);margin-top:8px}
+.abtn{width:100%;padding:13px;background:var(--a);color:#0a0a0a;border:none;border-radius:8px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.1em;cursor:pointer;display:none;transition:all .15s}
+.abtn:hover{background:#d8ff5a;transform:translateY(-1px)}.abtn.v{display:block}.abtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.ww{background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:14px;display:none}
+.ww.v{display:block}
+.wl{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.1em;margin-bottom:8px}
+
+/* SECTION HEADS */
+.sh{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between}
+.sh-action{font-size:9px;color:var(--t3);cursor:pointer;text-decoration:none;letter-spacing:.05em}
+.sh-action:hover{color:var(--a)}
+
+/* RESULTS */
+.res{display:none;flex-direction:column;gap:16px}.res.v{display:flex}
+.dc{background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:18px}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.dst{background:var(--s2);border-radius:8px;padding:10px}
+.dv{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--a);line-height:1}
+.dk{font-size:11px;color:var(--t2);margin-top:3px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.05em;padding:3px 9px;border-radius:20px;border:1px solid}
+.tg{color:var(--a);border-color:rgba(200,240,77,.3);background:rgba(200,240,77,.06)}
+.tp{color:var(--a2);border-color:rgba(240,77,138,.3);background:rgba(240,77,138,.06)}
+.tb{color:var(--a3);border-color:rgba(77,200,240,.3);background:rgba(77,200,240,.06)}
+
+/* MATCH CARDS */
+.mc{background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;margin-bottom:7px;cursor:pointer;transition:all .15s}
+.mc:hover{border-color:var(--bh);background:var(--s2)}
+.mc.orig{border-color:rgba(200,240,77,.4)}
+.mn{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);min-width:18px;padding-top:2px}
+.mb{flex:1;min-width:0}.mt{font-size:13px;font-weight:500}.ma{font-size:11px;color:var(--t2);margin-top:2px}
+.mr{font-size:11px;color:var(--t3);margin-top:5px;line-height:1.5;font-style:italic}
+.mc-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.mbg{font-family:'Space Mono',monospace;font-size:9px;padding:3px 7px;border-radius:4px;white-space:nowrap}
+.bo{background:rgba(200,240,77,.1);color:var(--a)}.bs{background:rgba(77,200,240,.1);color:var(--a3)}.bf{background:rgba(240,77,138,.1);color:var(--a2)}
+.fav-btn{background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1;padding:2px;transition:color .15s}
+.fav-btn:hover,.fav-btn.active{color:var(--a2)}
+
+/* LOADING */
+.lw{display:none;flex-direction:column;gap:10px;padding:20px;background:var(--s1);border:1px solid var(--b);border-radius:10px}
+.lw.v{display:flex}.lb{height:2px;background:var(--s3);border-radius:2px;overflow:hidden}
+.lf{height:100%;background:var(--a);animation:lp 1.4s ease-in-out infinite}
+@keyframes lp{0%{width:0}50%{width:85%}100%{width:95%}}
+.lt{font-family:'Space Mono',monospace;font-size:10px;color:var(--t2);letter-spacing:.05em}
+
+/* RIGHT PANEL */
+.rtabs{display:flex;border-bottom:1px solid var(--b)}
+.rtab{flex:1;padding:12px 4px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.06em;color:var(--t3);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.rtab:hover{color:var(--t2)}.rtab.a{color:var(--a);border-bottom-color:var(--a)}
+.rc{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.rc::-webkit-scrollbar{width:3px}.rc::-webkit-scrollbar-thumb{background:var(--s3)}
+.tp2{display:none;flex-direction:column;gap:8px}.tp2.a{display:flex}
+
+/* TRENDING */
+.ti{display:flex;gap:10px;align-items:center;padding:10px;background:var(--s1);border:1px solid var(--b);border-radius:8px;cursor:pointer;transition:all .15s}
+.ti:hover{border-color:var(--bh);background:var(--s2)}
+.tn{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);min-width:16px}
+.tif{flex:1;min-width:0}.ts2{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ta2{font-size:10px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc2{font-family:'Space Mono',monospace;font-size:9px;color:var(--a)}
+
+/* GENRE BROWSER */
+.genres{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.genre-pill{padding:9px 12px;background:var(--s1);border:1px solid var(--b);border-radius:8px;cursor:pointer;transition:all .15s;text-align:center}
+.genre-pill:hover{border-color:var(--bh)}
+.genre-pill.sel{border-color:var(--a);background:rgba(200,240,77,0.06)}
+.gp-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--t);letter-spacing:.05em}
+.gp-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* HISTORY / FAVORITES */
+.hist-item{display:flex;gap:10px;align-items:center;padding:10px 12px;background:var(--s1);border:1px solid var(--b);border-radius:8px;cursor:pointer;transition:all .15s}
+.hist-item:hover{border-color:var(--bh);background:var(--s2)}
+.hist-name{font-size:12px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-meta{font-size:10px;color:var(--t3);font-family:'Space Mono',monospace;white-space:nowrap}
+.empty-state{text-align:center;padding:32px 16px;color:var(--t3);font-size:12px;line-height:1.8}
+.empty-icon{font-size:28px;margin-bottom:10px;opacity:.4}
+
+/* GRAPH */
+.gw{background:var(--s1);border:1px solid var(--b);border-radius:10px;padding:14px}
+.nl{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--s1);border:1px solid var(--b);border-radius:8px;font-size:11px}
+.nd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ntl{font-weight:500;flex:1}.ny{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3)}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:100%}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-bottom:10px;min-height:100px}
+.msgs::-webkit-scrollbar{width:3px}.msgs::-webkit-scrollbar-thumb{background:var(--s3)}
+.mu{background:rgba(200,240,77,.08);border:1px solid rgba(200,240,77,.2);border-radius:10px 10px 2px 10px;padding:9px 12px;font-size:12px;max-width:85%;align-self:flex-end}
+.mai{background:var(--s1);border:1px solid var(--b);border-radius:2px 10px 10px 10px;padding:9px 12px;font-size:12px;color:var(--t2);line-height:1.65}
+.mai strong{color:var(--t)}
+.aib{font-family:'Space Mono',monospace;font-size:9px;color:var(--a);letter-spacing:.08em;margin-bottom:4px;display:block}
+.ciw{display:flex;gap:7px;padding-top:10px;border-top:1px solid var(--b);margin-top:8px}
+.ci{flex:1;background:var(--s1);border:1px solid var(--b);border-radius:8px;padding:9px 11px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--t);outline:none}
+.ci:focus{border-color:var(--bh)}.ci::placeholder{color:var(--t3)}
+.cs{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:9px 12px;color:var(--a);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap}
+.cs:hover{background:rgba(200,240,77,.1)}.cs:disabled{opacity:.4;cursor:not-allowed}
+.sugs{display:flex;flex-direction:column;gap:5px;margin-bottom:4px}
+.sug{font-size:11px;color:var(--t3);padding:7px 10px;border:1px solid var(--b);border-radius:6px;cursor:pointer;background:var(--s1)}
+.sug:hover{color:var(--t2);border-color:var(--bh)}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--s3);border-top-color:var(--a);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* SEARCH RESULTS */
+.sr-card{background:var(--s1);border:1px solid var(--b);border-radius:9px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.sr-card:hover{border-color:var(--bh);background:var(--s2)}
+.sr-card.is-orig{border-color:rgba(200,240,77,.35)}
+.sr-title{font-size:13px;font-weight:500;color:var(--t)}
+.sr-sub{font-size:11px;color:var(--t2);margin-top:3px}
+.sr-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.sr-reason{font-size:11px;color:var(--t3);margin-top:5px;font-style:italic;line-height:1.5}
+.sr-section{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin:10px 0 6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:9px 16px;font-family:'Space Mono',monospace;font-size:11px;color:var(--t2);z-index:100;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){main{grid-template-columns:1fr}.right{position:static;height:auto}}
+</style>
+</head>
+<body>
+
+
+
+<header>
+  <div class="logo">SOHMNA <span>/ sample intelligence</span></div>
+  <div id="key-wrap" style="display:none">
+    <input id="apikey" type="password" placeholder="Paste Anthropic API key here..." oninput="onKey(this.value)">
+    <div id="keyst">NO KEY</div>
+  </div>
+</header>
+
+<main>
+  <div class="left">
+    <!-- Drop Zone -->
+    <div class="drop" id="dz" onclick="document.getElementById('fi').click()">
+      <div class="di" id="dicon">&#9834;</div>
+      <div class="dt" id="dtitle">DROP YOUR TRACK</div>
+      <div class="ds" id="dsub">Drag &amp; drop an audio file, or click to browse</div>
+      <div class="df">MP3 &middot; WAV &middot; FLAC &middot; AAC &middot; OGG</div>
+    </div>
+    <input type="file" id="fi" accept="audio/*" style="display:none">
+
+    <div class="ww" id="ww"><div class="wl">WAVEFORM PREVIEW</div><canvas id="wc" style="width:100%;height:52px;display:block"></canvas></div>
+    <button class="abtn" id="abtn" onclick="analyze()">ANALYZE DNA &rarr;</button>
+
+    <div class="lw" id="lw"><div class="lt" id="lt">SCANNING...</div><div class="lb"><div class="lf"></div></div></div>
+
+    <div class="res" id="res">
+      <div>
+        <div class="sh">AUDIO DNA</div>
+        <div class="dc">
+          <div class="dg" id="dg"></div>
+          <div class="tags" id="dtags"></div>
+        </div>
+      </div>
+      <div>
+        <div class="sh">AI ANALYSIS</div>
+        <div class="dc" id="atext" style="font-size:12px;color:var(--t2);line-height:1.7"></div>
+      </div>
+      <div>
+        <div class="sh">
+          SAMPLE CONNECTIONS
+          <span class="sh-action" onclick="saveToFaves()">+ save to favorites</span>
+        </div>
+        <div id="ml"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="rtabs">
+      <button class="rtab a" onclick="stab('tr',this)">TRENDING</button>
+      <button class="rtab" onclick="stab('sr',this)">SEARCH</button>
+      <button class="rtab" onclick="stab('gn',this)">GENRES</button>
+      <button class="rtab" onclick="stab('gp',this)">MAP</button>
+      <button class="rtab" onclick="stab('fv',this)">SAVED</button>
+      <button class="rtab" onclick="stab('dg2',this)">DIG</button>
+    </div>
+    <div class="rc">
+
+      <!-- TRENDING -->
+      <div class="tp2 a" id="tab-tr">
+        <div class="sh">TODAY'S TRENDING <span class="sh-action" onclick="refreshTrending()">&#8635; refresh</span></div>
+        <div id="tlist"></div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="tp2" id="tab-sr">
+        <div class="sh">SEARCH ARTISTS &amp; TRACKS</div>
+        <div style="display:flex;gap:7px;margin-bottom:12px">
+          <input id="search-input" type="text" placeholder="e.g. James Brown, Wu-Tang..." style="flex:1;background:var(--s1);border:1px solid var(--b);border-radius:8px;padding:9px 12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--t);outline:none" onkeydown="if(event.key==='Enter')doSearch()" onfocus="this.style.borderColor='rgba(200,240,77,0.5)'" onblur="this.style.borderColor='var(--b)'">
+          <button onclick="doSearch()" style="background:var(--a);border:none;border-radius:8px;padding:9px 14px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#0a0a0a;cursor:pointer;white-space:nowrap">GO</button>
+        </div>
+        <div id="search-status" style="font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);margin-bottom:8px;display:none"></div>
+        <div id="search-results" style="display:flex;flex-direction:column;gap:7px"></div>
+      </div>
+
+      <!-- GENRES -->
+      <div class="tp2" id="tab-gn">
+        <div class="sh">BROWSE BY GENRE</div>
+        <div class="genres" id="genre-grid"></div>
+        <div id="genre-tracks" style="margin-top:10px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <!-- DNA MAP -->
+      <div class="tp2" id="tab-gp">
+        <div class="sh">DNA CONNECTION MAP</div>
+        <div class="gw"><canvas id="gc" style="width:100%;height:220px;display:block"></canvas></div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--t2);flex-wrap:wrap">
+          <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a);margin-right:4px;vertical-align:middle"></span>Your track</span>
+          <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a3);margin-right:4px;vertical-align:middle"></span>Original</span>
+          <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a2);margin-right:4px;vertical-align:middle"></span>Sibling/Flip</span>
+        </div>
+        <div class="sh" style="margin-top:14px">CONNECTED TRACKS</div>
+        <div class="nl" id="nl"><div style="font-size:11px;color:var(--t3);padding:8px">Analyze a track to see its map.</div></div>
+      </div>
+
+      <!-- SAVED / FAVORITES -->
+      <div class="tp2" id="tab-fv">
+        <div class="sh">
+          SAVED ANALYSES
+          <span class="sh-action" onclick="clearFaves()">clear all</span>
+        </div>
+        <div id="faves-list"></div>
+      </div>
+
+      <!-- SAMPLE DIGGER -->
+      <div class="tp2" id="tab-dg2" style="flex:1;min-height:0">
+        <div class="chat-wrap">
+          <div class="sh">AI SAMPLE DIGGER</div>
+          <div class="msgs" id="msgs">
+            <div class="mai"><span class="aib">SOHMNA AI</span>Ready to dig. Tell me a vibe, era, or sound and I'll find the original breaks and samples that match.</div>
+          </div>
+          <div class="sugs" id="sugs">
+            <div class="sug" onclick="useSug(this)">Find dusty soul samples from 1970s Memphis</div>
+            <div class="sug" onclick="useSug(this)">What breaks defined 90s NYC boom bap?</div>
+            <div class="sug" onclick="useSug(this)">Obscure funk records sampled by J Dilla</div>
+          </div>
+          <div class="ciw">
+            <input class="ci" id="ci" placeholder="Describe a sound, era, feeling...">
+            <button class="cs" id="csend">SEND</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+var _key='',_dna=null,_hist=[],_lock=false,_file=null;
+
+// ── GENRES DATA ──
+var GENRES=[
+  {name:'Funk',sub:'1960s–80s grooves',color:'var(--a)',tracks:[
+    {s:'Funky Drummer',a:'James Brown',y:'1970'},{s:'Give It Up or Turnit a Loose',a:'James Brown',y:'1969'},
+    {s:'Ashley\'s Roachclip',a:'The Soul Searchers',y:'1974'},{s:'Nautilus',a:'Bob James',y:'1974'}
+  ]},
+  {name:'Soul',sub:'Deep & soulful',color:'var(--a2)',tracks:[
+    {s:'As Long As I\'ve Got You',a:'The Charmels',y:'1967'},{s:'Think (About It)',a:'Lyn Collins',y:'1972'},
+    {s:'Impeach the President',a:'The Honey Drippers',y:'1973'},{s:'Tramp',a:'Lowell Fulson',y:'1967'}
+  ]},
+  {name:'Jazz',sub:'Cool & bebop',color:'var(--a3)',tracks:[
+    {s:'Today',a:'Tom Scott & CA Dreamers',y:'1972'},{s:'Tidal Wave',a:'Donald Byrd',y:'1972'},
+    {s:'Cristo Redentor',a:'Donald Byrd',y:'1963'},{s:'Maiden Voyage',a:'Herbie Hancock',y:'1965'}
+  ]},
+  {name:'Breaks',sub:'Drum breaks',color:'#ff9944',tracks:[
+    {s:'Amen Brother',a:'The Winstons',y:'1969'},{s:'Think',a:'James Brown',y:'1960'},
+    {s:'Apache',a:'The Incredible Bongo Band',y:'1973'},{s:'Synthetic Substitution',a:'Melvin Bliss',y:'1973'}
+  ]},
+  {name:'Reggae',sub:'Roots & dub',color:'#44ff88',tracks:[
+    {s:'The Harder They Come',a:'Jimmy Cliff',y:'1972'},{s:'Police & Thieves',a:'Junior Murvin',y:'1976'},
+    {s:'Pressure Drop',a:'Toots & the Maytals',y:'1969'},{s:'Liquidator',a:'Harry J Allstars',y:'1969'}
+  ]},
+  {name:'Disco',sub:'Hi-NRG & dance',color:'#ff44cc',tracks:[
+    {s:'Good Times',a:'Chic',y:'1979'},{s:'Ring My Bell',a:'Anita Ward',y:'1979'},
+    {s:'Love to Love You Baby',a:'Donna Summer',y:'1975'},{s:'I Feel Love',a:'Donna Summer',y:'1977'}
+  ]},
+];
+
+// ── TRENDING — AI powered, cached daily ──
+var TRENDING=[];
+
+// ── KEY MANAGEMENT ──
+function onKey(v){
+  _key=v.trim();
+  try{localStorage.setItem('crate_k',_key);}catch(e){}
+  var bn=document.getElementById('banner');if(bn)bn.style.display='none';
+}
+(function(){
+  try{var k=localStorage.getItem('crate_k')||'';if(k){_key=k;}}catch(e){}
+})();
+
+function getKey(){return _key;}
+
+function apiCall(body,cb){
+  fetch('/.netlify/functions/claude',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).then(function(r){return r.ok?r.json():r.json().then(function(e){throw new Error(e.error&&e.error.message?e.error.message:'Error '+r.status);});})
+  .then(function(d){cb(null,d);}).catch(function(e){cb(e,null);});
+}
+
+// ── RENDER TRENDING ──
+function renderTrending(list){
+  var tl=document.getElementById('tlist');
+  tl.innerHTML='';
+  list.forEach(function(t,i){
+    var d=document.createElement('div');d.className='ti';
+    d.innerHTML='<div class="tn">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="tif"><div class="ts2">'+t.s+'</div><div class="ta2">'+t.a+' \u00b7 '+t.y+' \u00b7 '+t.g+'</div></div>'+
+      '<div class="tc2">'+t.u+'</div>';
+    d.onclick=function(){loadTrend(t.s,t.a);};
+    tl.appendChild(d);
+  });
+}
+
+function loadTrendingAI(){
+  var tl=document.getElementById('tlist');
+  // Check cache — refresh once per day
+  try{
+    var cache=JSON.parse(localStorage.getItem('sohmna_trending')||'{}');
+    var today=new Date().toDateString();
+    if(cache.date===today&&cache.data&&cache.data.length){
+      TRENDING=cache.data;renderTrending(TRENDING);return;
+    }
+  }catch(e){}
+
+  // Show skeleton loading
+  tl.innerHTML='<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--t3);padding:10px;display:flex;align-items:center;gap:8px"><span class="spin"></span> GENERATING TODAY\'S TRENDING...</div>';
+
+  var today=new Date();
+  var dateStr=today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  var prompt='You are a sample music expert. Today is '+dateStr+'. Generate a fresh trending list of 10 of the most culturally significant and heavily sampled original tracks in hip-hop, funk, soul, and electronic music history. Mix classics with some that might be relevant to current music trends.\n\nReturn ONLY valid JSON array, no markdown:\n[{"s":"Song Title","a":"Artist Name","y":"1972","u":"1,200+","g":"Funk"},{"s":"Song2","a":"Artist2","y":"1969","u":"2,000+","g":"Soul"}]\n\nInclude 10 tracks total. Make the list feel fresh and varied each time — don\'t always pick the same obvious ones. Mix iconic breaks, vocal samples, jazz loops, and soul records.';
+
+  apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
+    if(err){
+      // Fallback to hardcoded if API fails
+      var fallback=[
+        {s:'Amen Brother',a:'The Winstons',y:'1969',u:'2,000+',g:'Funk'},
+        {s:'Funky Drummer',a:'James Brown',y:'1970',u:'1,100+',g:'Funk'},
+        {s:'Think (About It)',a:'Lyn Collins',y:'1972',u:'1,400+',g:'Soul'},
+        {s:'Nautilus',a:'Bob James',y:'1974',u:'700+',g:'Jazz-Funk'},
+        {s:'Impeach the President',a:'The Honey Drippers',y:'1973',u:'1,200+',g:'Soul'},
+        {s:'La Di Da Di',a:'Slick Rick & Doug E Fresh',y:'1985',u:'800+',g:'Hip-Hop'},
+        {s:'Ashley\'s Roachclip',a:'The Soul Searchers',y:'1974',u:'900+',g:'Funk'},
+        {s:'As Long As I\'ve Got You',a:'The Charmels',y:'1967',u:'600+',g:'Soul'},
+        {s:'Cola Bottle Baby',a:'Edwin Birdsong',y:'1979',u:'500+',g:'Funk'},
+        {s:'Today',a:'Tom Scott & CA Dreamers',y:'1972',u:'400+',g:'Jazz'},
+      ];
+      TRENDING=fallback;renderTrending(fallback);return;
+    }
+    try{
+      var raw=data.content.map(function(b){return b.text||'';}).join('');
+      var parsed=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      TRENDING=parsed;
+      renderTrending(parsed);
+      // Cache for today
+      try{localStorage.setItem('sohmna_trending',JSON.stringify({date:new Date().toDateString(),data:parsed}));}catch(e){}
+    }catch(e){
+      tl.innerHTML='<div style="font-size:11px;color:var(--t3);padding:8px">Could not load trending. Try refreshing.</div>';
+    }
+  });
+}
+
+// Load trending on startup (slight delay so key is ready)
+setTimeout(loadTrendingAI, 300);
+
+function refreshTrending(){
+  try{localStorage.removeItem('sohmna_trending');}catch(e){}
+  loadTrendingAI();
+}
+
+// ── RENDER GENRES ──
+var gg=document.getElementById('genre-grid');
+GENRES.forEach(function(g){
+  var d=document.createElement('div');d.className='genre-pill';
+  d.innerHTML='<div class="gp-name" style="color:'+g.color+'">'+g.name+'</div><div class="gp-sub">'+g.sub+'</div>';
+  d.onclick=function(){
+    document.querySelectorAll('.genre-pill').forEach(function(x){x.classList.remove('sel');});
+    d.classList.add('sel');showGenreTracks(g);
+  };
+  gg.appendChild(d);
+});
+
+function showGenreTracks(g){
+  var c=document.getElementById('genre-tracks');c.innerHTML='';
+  c.innerHTML='<div class="sh">'+g.name.toUpperCase()+' CLASSICS</div>';
+  g.tracks.forEach(function(t){
+    var d=document.createElement('div');d.className='ti';
+    d.innerHTML='<div class="tif"><div class="ts2">'+t.s+'</div><div class="ta2">'+t.a+' \u00b7 '+t.y+'</div></div>';
+    d.onclick=function(){loadTrend(t.s,t.a);stab('tr',document.querySelectorAll('.rtab')[0]);};
+    c.appendChild(d);
+  });
+}
+
+// ── DRAG & DROP ──
+var dz=document.getElementById('dz');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
+dz.addEventListener('drop',function(e){
+  e.preventDefault();dz.classList.remove('over');
+  var f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('audio/'))loadFile(f);else toast('Drop an audio file (MP3, WAV, FLAC...)');
+});
+document.getElementById('fi').addEventListener('change',function(e){if(e.target.files[0])loadFile(e.target.files[0]);});
+
+function loadFile(f){
+  _file=f;
+  document.getElementById('dicon').textContent='\u2713';
+  document.getElementById('dtitle').textContent=f.name.replace(/\.[^.]+$/,'').toUpperCase().slice(0,28);
+  document.getElementById('dsub').textContent=(f.size/1024/1024).toFixed(1)+'MB \u00b7 '+(f.type.split('/')[1]||'').toUpperCase();
+  dz.classList.add('has');document.getElementById('abtn').classList.add('v');drawWave(f);
+}
+
+function drawWave(f){
+  var w=document.getElementById('ww');w.classList.add('v');
+  var c=document.getElementById('wc'),ctx=c.getContext('2d');
+  c.width=c.offsetWidth*(devicePixelRatio||1);c.height=52*(devicePixelRatio||1);
+  ctx.scale(devicePixelRatio||1,devicePixelRatio||1);
+  var W=c.offsetWidth,H=52;
+  for(var i=0;i<100;i++){
+    var h=(Math.sin(i*.37+f.size*.000001)*.5+.5)*.7+.1;
+    ctx.fillStyle=i%3===0?'#c8f04d':'rgba(200,240,77,.3)';
+    ctx.fillRect((i/100)*W,((H-h*H)/2),(W/100)*.55,h*H);
+  }
+}
+
+// ── ANALYZE ──
+function analyze(){
+  if(!_file)return;
+  var btn=document.getElementById('abtn');btn.disabled=true;btn.textContent='ANALYZING...';
+  document.getElementById('lw').classList.add('v');document.getElementById('res').classList.remove('v');
+  var steps=['SCANNING FINGERPRINT...','DETECTING BPM & KEY...','ANALYZING HARMONICS...','QUERYING SAMPLE DB...','TRACING DNA...','GENERATING INSIGHTS...'];
+  var si=0,iv=setInterval(function(){if(si<steps.length)document.getElementById('lt').textContent=steps[si++];},900);
+  var name=_file.name.replace(/\.[^.]+$/,''),mb=(_file.size/1024/1024).toFixed(1);
+  var prompt='You are an expert music analyst and crate digger. Track: "'+name+'" ('+mb+'MB).\nReturn ONLY valid JSON, no markdown:\n{"bpm":"92-96","key":"Fm","era":"1970s","genre_tags":["Soul","Funk","R&B"],"mood_tags":["Melancholic","Groove"],"sonic_tags":["Dusty","Warm","Lo-fi"],"analysis":"2-3 sentence sonic DNA description.","matches":[{"title":"Song","artist":"Artist","year":"1972","type":"original","reason":"One sentence."},{"title":"Song2","artist":"Artist2","year":"1994","type":"sibling","reason":"One sentence."},{"title":"Song3","artist":"Artist3","year":"1998","type":"flip","reason":"One sentence."},{"title":"Song4","artist":"Artist4","year":"2001","type":"sibling","reason":"One sentence."}]}';
+  apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
+    clearInterval(iv);document.getElementById('lw').classList.remove('v');
+    if(err){toast('Error: '+err.message);btn.disabled=false;btn.textContent='RE-ANALYZE';return;}
+    try{
+      var raw=data.content.map(function(b){return b.text||'';}).join('');
+      var p=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      _dna=p;renderRes(p,name);drawGraph(p,name);addToHistory(name,p);
+    }catch(e){toast('Parse error: '+e.message);}
+    btn.disabled=false;btn.textContent='RE-ANALYZE \u2713';
+  });
+}
+
+function renderRes(d,name){
+  document.getElementById('dg').innerHTML=
+    '<div class="dst"><div class="dv">'+d.bpm+'</div><div class="dk">BPM</div></div>'+
+    '<div class="dst"><div class="dv">'+d.key+'</div><div class="dk">KEY</div></div>'+
+    '<div class="dst"><div class="dv">'+d.era+'</div><div class="dk">ERA</div></div>';
+  var tg=document.getElementById('dtags');tg.innerHTML='';
+  (d.genre_tags||[]).forEach(function(t){tg.innerHTML+='<span class="tag tg">'+t+'</span>';});
+  (d.mood_tags||[]).forEach(function(t){tg.innerHTML+='<span class="tag tp">'+t+'</span>';});
+  (d.sonic_tags||[]).forEach(function(t){tg.innerHTML+='<span class="tag tb">'+t+'</span>';});
+  document.getElementById('atext').textContent=d.analysis||'';
+  var ml=document.getElementById('ml');ml.innerHTML='';
+  var tm={original:{c:'bo',l:'ORIGINAL SOURCE',x:'orig'},sibling:{c:'bs',l:'SIBLING FLIP',x:''},flip:{c:'bf',l:'FLIPPED THIS',x:''}};
+  (d.matches||[]).forEach(function(m,i){
+    var t=tm[m.type]||tm.sibling;
+    var el=document.createElement('div');el.className='mc '+t.x;
+    el.innerHTML='<div class="mn">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="mb"><div class="mt">'+m.title+'</div><div class="ma">'+m.artist+' \u00b7 '+m.year+'</div><div class="mr">'+m.reason+'</div></div>'+
+      '<div class="mc-right"><span class="mbg '+t.c+'">'+t.l+'</span><button class="fav-btn" onclick="toggleFavMatch(this,\''+m.title.replace(/'/g,"\\'")+'\')" title="Save">&#9825;</button></div>';
+    ml.appendChild(el);
+  });
+  document.getElementById('res').classList.add('v');
+  stab('gp',document.querySelectorAll('.rtab')[2]);
+}
+
+function drawGraph(d,name){
+  var c=document.getElementById('gc'),ctx=c.getContext('2d');
+  var W=c.offsetWidth,H=220;
+  c.width=W*(devicePixelRatio||1);c.height=H*(devicePixelRatio||1);
+  ctx.scale(devicePixelRatio||1,devicePixelRatio||1);ctx.clearRect(0,0,W,H);
+  var cx=W/2,cy=H/2;
+  (d.matches||[]).forEach(function(m,i){
+    var a=(i/d.matches.length)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*82,y=cy+Math.sin(a)*76;
+    var col=m.type==='original'?'#4dc8f0':'#f04d8a';
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=col+'44';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,14,0,6.28);ctx.fillStyle=col+'22';ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=col;ctx.font='500 8px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(m.artist.split(' ').pop().slice(0,7),x,y);
+  });
+  ctx.beginPath();ctx.arc(cx,cy,22,0,6.28);ctx.fillStyle='rgba(200,240,77,.15)';ctx.fill();ctx.strokeStyle='#c8f04d';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#c8f04d';ctx.font='700 8px Space Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(name.slice(0,8),cx,cy);
+  var nl=document.getElementById('nl');
+  nl.innerHTML='<div class="ni"><div class="nd" style="background:var(--a)"></div><div class="ntl">'+name+'</div><div class="ny">YOUR TRACK</div></div>';
+  (d.matches||[]).forEach(function(m){
+    var col=m.type==='original'?'var(--a3)':'var(--a2)',lbl=m.type==='original'?'SOURCE':m.type==='flip'?'FLIP':'SIBLING';
+    nl.innerHTML+='<div class="ni"><div class="nd" style="background:'+col+'"></div><div class="ntl">'+m.title+' \u2014 '+m.artist+'</div><div class="ny">'+m.year+' \u00b7 '+lbl+'</div></div>';
+  });
+}
+
+// ── HISTORY & FAVORITES ──
+function getHistory(){try{return JSON.parse(localStorage.getItem('crate_hist')||'[]');}catch(e){return[];}}
+function saveHistory(h){try{localStorage.setItem('crate_hist',JSON.stringify(h));}catch(e){}}
+function getFaves(){try{return JSON.parse(localStorage.getItem('crate_faves')||'[]');}catch(e){return[];}}
+function saveFavesStore(f){try{localStorage.setItem('crate_faves',JSON.stringify(f));}catch(e){}}
+
+function addToHistory(name,dna){
+  var h=getHistory();
+  h.unshift({name:name,bpm:dna.bpm,key:dna.key,era:dna.era,genre:(dna.genre_tags||[])[0]||'',ts:Date.now()});
+  if(h.length>20)h=h.slice(0,20);
+  saveHistory(h);renderFaves();
+}
+
+function saveToFaves(){
+  if(!_dna||!_file){toast('Analyze a track first');return;}
+  var name=_file.name.replace(/\.[^.]+$/,'');
+  var f=getFaves();
+  if(f.find(function(x){return x.name===name;})){toast('Already saved');return;}
+  f.unshift({name:name,bpm:_dna.bpm,key:_dna.key,era:_dna.era,genre:(_dna.genre_tags||[])[0]||'',matches:_dna.matches,ts:Date.now()});
+  saveFavesStore(f);renderFaves();toast('Saved to favorites \u2713');
+}
+
+function toggleFavMatch(btn,title){
+  btn.classList.toggle('active');
+  btn.textContent=btn.classList.contains('active')?'\u2665':'\u2661';
+  toast(btn.classList.contains('active')?'Saved: '+title:'Removed: '+title);
+}
+
+function clearFaves(){
+  if(!confirm('Clear all saved analyses?'))return;
+  saveFavesStore([]);renderFaves();toast('Cleared');
+}
+
+function renderFaves(){
+  var fl=document.getElementById('faves-list');fl.innerHTML='';
+  var f=getFaves();
+  if(!f.length){
+    fl.innerHTML='<div class="empty-state"><div class="empty-icon">\u2661</div>No saved analyses yet.<br>Analyze a track and hit<br>"save to favorites" to keep it.</div>';
+    return;
+  }
+  f.forEach(function(item){
+    var d=document.createElement('div');d.className='hist-item';
+    d.innerHTML='<div class="hist-name">'+item.name+'</div>'+
+      '<div class="hist-meta">'+item.bpm+' \u00b7 '+item.key+' \u00b7 '+item.era+'</div>';
+    d.onclick=function(){
+      if(item.matches){_dna=item;renderRes(item,item.name);drawGraph(item,item.name);}
+      stab('gp',document.querySelectorAll('.rtab')[2]);toast('Loaded: '+item.name);
+    };
+    fl.appendChild(d);
+  });
+}
+renderFaves();
+
+// ── TREND / GENRE LOAD ──
+function loadTrend(s,a){
+  _file={name:s,size:5e6,type:'audio/mp3'};
+  document.getElementById('dicon').textContent='\u2713';
+  document.getElementById('dtitle').textContent=s.toUpperCase().slice(0,28);
+  document.getElementById('dsub').textContent=a+' \u2014 trending original';
+  dz.classList.add('has');document.getElementById('abtn').classList.add('v');
+  document.getElementById('ww').classList.remove('v');toast('Loaded: '+s);
+}
+
+// ── TABS ──
+function stab(name,btn){
+  document.querySelectorAll('.rtab').forEach(function(b){b.classList.remove('a');});
+  document.querySelectorAll('.tp2').forEach(function(p){p.classList.remove('a');});
+  if(btn)btn.classList.add('a');
+  var el=document.getElementById('tab-'+name);if(el)el.classList.add('a');
+}
+
+// ── ARTIST / TRACK SEARCH ──
+function doSearch(){
+  var q=document.getElementById('search-input').value.trim();
+  if(!q)return;
+  var status=document.getElementById('search-status');
+  var results=document.getElementById('search-results');
+  status.style.display='block';
+  status.innerHTML='<span class="spin"></span> SEARCHING FOR "'+q.toUpperCase()+'"...';
+  results.innerHTML='';
+
+  var prompt='You are an expert music historian and sample archaeologist. The user is searching for: "'+q+'".\n\nReturn information about this artist or track and their sample connections. Return ONLY valid JSON, no markdown:\n{\n  "artist": "Artist Name",\n  "description": "1-2 sentence bio focusing on their sample legacy.",\n  "known_for": ["tag1","tag2","tag3"],\n  "originals": [\n    {"title":"Song they sampled","artist":"Original artist","year":"1972","reason":"Why this connection matters."},\n    {"title":"Song2","artist":"Artist2","year":"1968","reason":"One sentence."}\n  ],\n  "sampled_by": [\n    {"title":"Song that sampled them","artist":"Sampling artist","year":"1993","reason":"One sentence."},\n    {"title":"Song2","artist":"Artist2","year":"1997","reason":"One sentence."},\n    {"title":"Song3","artist":"Artist3","year":"2001","reason":"One sentence."}\n  ],\n  "siblings": [\n    {"title":"Related track","artist":"Artist","year":"1975","reason":"Shares a sample source or similar DNA."}\n  ]\n}';
+
+  apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
+    status.style.display='none';
+    if(err){results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Error: '+err.message+'</div>';return;}
+    try{
+      var raw=data.content.map(function(b){return b.text||'';}).join('');
+      var p=JSON.parse(raw.replace(/```json|```/g,'').trim());
+      renderSearchResults(p,q);
+    }catch(e){
+      results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Could not parse results. Try a different search.</div>';
+    }
+  });
+}
+
+function renderSearchResults(p,q){
+  var r=document.getElementById('search-results');
+  r.innerHTML='';
+
+  // Artist header
+  var header=document.createElement('div');
+  header.style.cssText='background:var(--s2);border:1px solid rgba(200,240,77,.25);border-radius:10px;padding:14px 16px;margin-bottom:4px';
+  var tags=(p.known_for||[]).map(function(t){return '<span class="tag tg">'+t+'</span>';}).join('');
+  header.innerHTML='<div style="font-size:14px;font-weight:500;color:var(--t)">'+p.artist+'</div>'+
+    '<div style="font-size:12px;color:var(--t2);margin-top:4px;line-height:1.6">'+p.description+'</div>'+
+    '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">'+tags+'</div>';
+  r.appendChild(header);
+
+  // Originals they sampled
+  if(p.originals&&p.originals.length){
+    var s1=document.createElement('div');s1.className='sr-section';s1.textContent='SAMPLED FROM';r.appendChild(s1);
+    p.originals.forEach(function(m){
+      var d=document.createElement('div');d.className='sr-card is-orig';
+      d.innerHTML='<div class="sr-title">'+m.title+'</div><div class="sr-sub">'+m.artist+' \u00b7 '+m.year+'</div><div class="sr-reason">'+m.reason+'</div>';
+      d.onclick=function(){loadTrend(m.title,m.artist);stab('tr',document.querySelectorAll('.rtab')[0]);toast('Loaded: '+m.title);};
+      r.appendChild(d);
+    });
+  }
+
+  // Who sampled them
+  if(p.sampled_by&&p.sampled_by.length){
+    var s2=document.createElement('div');s2.className='sr-section';s2.textContent='SAMPLED BY';r.appendChild(s2);
+    p.sampled_by.forEach(function(m){
+      var d=document.createElement('div');d.className='sr-card';
+      d.innerHTML='<div class="sr-title">'+m.title+'</div><div class="sr-sub">'+m.artist+' \u00b7 '+m.year+'</div><div class="sr-reason">'+m.reason+'</div>';
+      d.onclick=function(){loadTrend(m.title,m.artist);stab('tr',document.querySelectorAll('.rtab')[0]);toast('Loaded: '+m.title);};
+      r.appendChild(d);
+    });
+  }
+
+  // Sibling DNA
+  if(p.siblings&&p.siblings.length){
+    var s3=document.createElement('div');s3.className='sr-section';s3.textContent='SIMILAR DNA';r.appendChild(s3);
+    p.siblings.forEach(function(m){
+      var d=document.createElement('div');d.className='sr-card';
+      d.innerHTML='<div class="sr-title">'+m.title+'</div><div class="sr-sub">'+m.artist+' \u00b7 '+m.year+'</div><div class="sr-reason">'+m.reason+'</div>';
+      d.onclick=function(){loadTrend(m.title,m.artist);stab('tr',document.querySelectorAll('.rtab')[0]);toast('Loaded: '+m.title);};
+      r.appendChild(d);
+    });
+  }
+}
+
+// ── CHAT ──
+document.getElementById('ci').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
+document.getElementById('csend').addEventListener('click',sendChat);
+
+function sendChat(){
+  if(_lock)return;
+  var inp=document.getElementById('ci'),msg=inp.value.trim();if(!msg)return;
+  inp.value='';document.getElementById('sugs').style.display='none';
+  addMsg(msg,'u');_hist.push({role:'user',content:msg});_lock=true;
+  document.getElementById('csend').disabled=true;
+  var tid='t'+Date.now(),m=document.getElementById('msgs');
+  var tp=document.createElement('div');tp.id=tid;tp.className='mai';
+  tp.innerHTML='<span class="aib">SOHMNA AI</span><span class="spin"></span>';
+  m.appendChild(tp);m.scrollTop=m.scrollHeight;
+  var sys='You are SOHMNA AI, an expert music historian and sample archaeologist with encyclopedic knowledge of sample-based music across hip-hop, funk, soul, jazz, reggae, and electronic music. Give specific artist names, years, record labels, and album names. Keep responses under 130 words. Bold key song names and artists with **text**.'+(_dna?' Context \u2014 analyzed track: BPM '+_dna.bpm+', Key '+_dna.key+', Era '+_dna.era+', Genres: '+(_dna.genre_tags||[]).join(', ')+'.':'');
+  apiCall({system:sys,messages:_hist},function(err,data){
+    var el=document.getElementById(tid);if(el)el.remove();
+    var r=err?'Error: '+err.message:data.content.map(function(b){return b.text||'';}).join('');
+    if(!err)_hist.push({role:'assistant',content:r});
+    addMsg(r,'a');_lock=false;document.getElementById('csend').disabled=false;
+  });
+}
+
+function addMsg(text,role){
+  var m=document.getElementById('msgs');
+  if(role==='u'){
+    var w=document.createElement('div');w.style.cssText='display:flex;justify-content:flex-end';
+    var b=document.createElement('div');b.className='mu';b.textContent=text;w.appendChild(b);m.appendChild(w);
+  }else{
+    var d=document.createElement('div');d.className='mai';
+    d.innerHTML='<span class="aib">SOHMNA AI</span>'+text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    m.appendChild(d);
+  }
+  m.scrollTop=m.scrollHeight;
+}
+
+function useSug(el){document.getElementById('ci').value=el.textContent;sendChat();}
+
+function toast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+</script>
+</body>
+</html>

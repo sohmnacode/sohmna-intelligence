@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SOHMNA - Sample Intelligence</title>
+<title>SOHMNA — Sample Intelligence</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -197,12 +197,12 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
     </div>
     <input type="file" id="fi" accept="audio/*" style="display:none">
     <div class="ww" id="ww"><div class="wl">WAVEFORM PREVIEW</div><canvas id="wc" style="width:100%;height:52px;display:block"></canvas></div>
-    <button class="abtn" id="abtn" onclick="analyze()">ANALYZE RESONANCE &rarr;</button>
+    <button class="abtn" id="abtn" onclick="analyze()">ANALYZE DNA &rarr;</button>
     <div class="lw" id="lw"><div class="lt" id="lt">SCANNING...</div><div class="lb"><div class="lf"></div></div></div>
 
     <div class="res" id="res">
       <div>
-        <div class="sh">AUDIO RESONANCE</div>
+        <div class="sh">AUDIO DNA</div>
         <div class="dc"><div class="dg" id="dg"></div><div class="tags" id="dtags"></div></div>
       </div>
       <div>
@@ -233,7 +233,7 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
       <button class="rtab" onclick="stab('sr',this)">SEARCH</button>
       <button class="rtab" onclick="stab('sl',this)">SOUNDS LIKE</button>
       <button class="rtab" onclick="stab('gn',this)">GENRES</button>
-      <button class="rtab" onclick="stab('gp',this)">RESONANCE</button>
+      <button class="rtab" onclick="stab('gp',this)">MAP</button>
       <button class="rtab" onclick="stab('fv',this)">SAVED</button>
       <button class="rtab" onclick="stab('dg2',this)">DIG</button>
     </div>
@@ -275,7 +275,7 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
 
       <!-- DNA MAP -->
       <div class="tp2" id="tab-gp">
-        <div class="sh">RESONANCE MAP</div>
+        <div class="sh">DNA CONNECTION MAP</div>
         <div class="gw"><canvas id="gc" style="width:100%;height:220px;display:block"></canvas></div>
         <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--t2);flex-wrap:wrap">
           <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--a);margin-right:4px;vertical-align:middle"></span>Your track</span>
@@ -320,7 +320,7 @@ main{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 57px)}
 var _key='',_dna=null,_hist=[],_lock=false,_file=null;
 
 var GENRES=[
-  {name:'Funk',sub:'1960sâ80s grooves',color:'var(--a)',tracks:[
+  {name:'Funk',sub:'1960s–80s grooves',color:'var(--a)',tracks:[
     {s:'Funky Drummer',a:'James Brown',y:'1970'},{s:'Give It Up or Turnit a Loose',a:'James Brown',y:'1969'},
     {s:"Ashley's Roachclip",a:'The Soul Searchers',y:'1974'},{s:'Nautilus',a:'Bob James',y:'1974'}
   ]},
@@ -359,7 +359,7 @@ function apiCall(body,cb){
   .then(function(d){cb(null,d);}).catch(function(e){cb(e,null);});
 }
 
-// ââ TRENDING ââ
+// ── TRENDING ──
 function renderTrending(list){
   var tl=document.getElementById('tlist');tl.innerHTML='';
   list.forEach(function(t,i){
@@ -381,7 +381,7 @@ function loadTrendingAI(){
   }catch(e){}
   tl.innerHTML='<div style="font-family:\'Space Mono\',monospace;font-size:10px;color:var(--t3);padding:10px;display:flex;align-items:center;gap:8px"><span class="spin"></span> GENERATING TODAY\'S TRENDING...</div>';
   var dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  var prompt='Today is '+dateStr+'. Generate a fresh top 10 list of the most culturally significant and heavily sampled original tracks. Mix classics with records relevant to current music trends. Return ONLY a JSON array:\n[{"s":"Song Title","a":"Artist Name","y":"1972","u":"1,200+","g":"Funk"}]\n10 tracks total. Vary the list â avoid always picking the same obvious ones.';
+  var prompt='Today is '+dateStr+'. Generate a fresh top 10 list of the most culturally significant and heavily sampled original tracks. Mix classics with records relevant to current music trends. Return ONLY a JSON array:\n[{"s":"Song Title","a":"Artist Name","y":"1972","u":"1,200+","g":"Funk"}]\n10 tracks total. Vary the list — avoid always picking the same obvious ones.';
   apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
     if(err){var fallback=[{s:'Amen Brother',a:'The Winstons',y:'1969',u:'2,000+',g:'Funk'},{s:'Think (About It)',a:'Lyn Collins',y:'1972',u:'1,400+',g:'Soul'},{s:'Impeach the President',a:'The Honey Drippers',y:'1973',u:'1,200+',g:'Soul'},{s:'Funky Drummer',a:'James Brown',y:'1970',u:'1,100+',g:'Funk'},{s:"Ashley's Roachclip",a:'The Soul Searchers',y:'1974',u:'900+',g:'Funk'},{s:'La Di Da Di',a:'Slick Rick & Doug E Fresh',y:'1985',u:'800+',g:'Hip-Hop'},{s:'Nautilus',a:'Bob James',y:'1974',u:'700+',g:'Jazz-Funk'},{s:"As Long As I've Got You",a:'The Charmels',y:'1967',u:'600+',g:'Soul'},{s:'Cola Bottle Baby',a:'Edwin Birdsong',y:'1979',u:'500+',g:'Funk'},{s:'Today',a:'Tom Scott & CA Dreamers',y:'1972',u:'400+',g:'Jazz'}];TRENDING=fallback;renderTrending(fallback);return;}
     try{
@@ -395,7 +395,7 @@ function loadTrendingAI(){
 setTimeout(loadTrendingAI,300);
 function refreshTrending(){try{localStorage.removeItem('sohmna_trending');}catch(e){}loadTrendingAI();}
 
-// ââ GENRES ââ
+// ── GENRES ──
 var gg=document.getElementById('genre-grid');
 GENRES.forEach(function(g){
   var d=document.createElement('div');d.className='genre-pill';
@@ -412,7 +412,7 @@ GENRES.forEach(function(g){
   };gg.appendChild(d);
 });
 
-// ââ DROP & FILE ââ
+// ── DROP & FILE ──
 var dz=document.getElementById('dz');
 dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over');});
 dz.addEventListener('dragleave',function(){dz.classList.remove('over');});
@@ -433,16 +433,16 @@ function loadFile(f){
   for(var i=0;i<100;i++){var h=(Math.sin(i*.37+f.size*.000001)*.5+.5)*.7+.1;ctx.fillStyle=i%3===0?'#c8f04d':'rgba(200,240,77,.3)';ctx.fillRect((i/100)*W,((H-h*H)/2),(W/100)*.55,h*H);}
 }
 
-// ââ ANALYZE ââ
+// ── ANALYZE ──
 function analyze(){
   if(!_file)return;
   var btn=document.getElementById('abtn');btn.disabled=true;btn.textContent='ANALYZING...';
   document.getElementById('lw').classList.add('v');document.getElementById('res').classList.remove('v');
   document.getElementById('pnotes-wrap').style.display='none';
-  var steps=['SCANNING FINGERPRINT...','DETECTING BPM & KEY...','ANALYZING HARMONICS...','QUERYING SAMPLE DB...','TRACING RESONANCE...','GENERATING INSIGHTS...'];
+  var steps=['SCANNING FINGERPRINT...','DETECTING BPM & KEY...','ANALYZING HARMONICS...','QUERYING SAMPLE DB...','TRACING DNA...','GENERATING INSIGHTS...'];
   var si=0,iv=setInterval(function(){if(si<steps.length)document.getElementById('lt').textContent=steps[si++];},900);
   var name=_file.name.replace(/\.[^.]+$/,''),mb=(_file.size/1024/1024).toFixed(1);
-  var prompt='You are an expert music analyst and crate digger. Track: "'+name+'" ('+mb+'MB). Return ONLY valid JSON, no markdown:\n{"bpm":"92-96","key":"Fm","era":"1970s","genre_tags":["Soul","Funk"],"mood_tags":["Melancholic","Groove"],"sonic_tags":["Dusty","Warm"],"analysis":"2-3 sentence sonic resonance description.","chop_bpm":88,"chop_key":"Fm","compatible_keys":["Ab","Cm","Bb"],"flip_tip":"One sentence on how to flip this for a beat.","matches":[{"title":"Song","artist":"Artist","year":"1972","type":"original","reason":"One sentence."},{"title":"Song2","artist":"Artist2","year":"1994","type":"sibling","reason":"One sentence."},{"title":"Song3","artist":"Artist3","year":"1998","type":"flip","reason":"One sentence."},{"title":"Song4","artist":"Artist4","year":"2001","type":"sibling","reason":"One sentence."}]}';
+  var prompt='You are an expert music analyst and crate digger. Track: "'+name+'" ('+mb+'MB). Return ONLY valid JSON, no markdown:\n{"bpm":"92-96","key":"Fm","era":"1970s","genre_tags":["Soul","Funk"],"mood_tags":["Melancholic","Groove"],"sonic_tags":["Dusty","Warm"],"analysis":"2-3 sentence sonic DNA description.","chop_bpm":88,"chop_key":"Fm","compatible_keys":["Ab","Cm","Bb"],"flip_tip":"One sentence on how to flip this for a beat.","matches":[{"title":"Song","artist":"Artist","year":"1972","type":"original","reason":"One sentence."},{"title":"Song2","artist":"Artist2","year":"1994","type":"sibling","reason":"One sentence."},{"title":"Song3","artist":"Artist3","year":"1998","type":"flip","reason":"One sentence."},{"title":"Song4","artist":"Artist4","year":"2001","type":"sibling","reason":"One sentence."}]}';
   apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
     clearInterval(iv);document.getElementById('lw').classList.remove('v');
     if(err){toast('Error: '+err.message);btn.disabled=false;btn.textContent='RE-ANALYZE';return;}
@@ -480,7 +480,7 @@ function renderRes(d,name){
   stab('gp',document.querySelectorAll('.rtab')[4]);
 }
 
-// ââ PRODUCER NOTES ââ
+// ── PRODUCER NOTES ──
 function renderProducerNotes(d){
   if(!d.chop_bpm&&!d.flip_tip)return;
   var w=document.getElementById('pnotes-wrap');w.style.display='block';
@@ -494,7 +494,7 @@ function renderProducerNotes(d){
     (d.flip_tip?'<div class="pn-tip">&#128161; '+d.flip_tip+'</div>':'');
 }
 
-// ââ SHARE ââ
+// ── SHARE ──
 function openShare(){
   if(!_dna){toast('Analyze a track first');return;}
   var name=_dna._name||(_file?_file.name.replace(/\.[^.]+$/,''):'Track');
@@ -516,7 +516,7 @@ function copyShareText(){
   if(!_dna)return;
   var name=_dna._name||'Track';
   var orig=(_dna.matches||[]).find(function(m){return m.type==='original';});
-  var txt='ðµ '+name+' â '+(_dna.bpm||'?')+' BPM, '+(_dna.key||'?')+', '+(_dna.era||'')+'\n';
+  var txt='🎵 '+name+' — '+(_dna.bpm||'?')+' BPM, '+(_dna.key||'?')+', '+(_dna.era||'')+'\n';
   if(orig)txt+='Original source: '+orig.title+' by '+orig.artist+' ('+orig.year+')\n';
   txt+='\nAnalyzed with SOHMNA Intelligence\nsohmna-intelligence.netlify.app';
   navigator.clipboard.writeText(txt).then(function(){toast('Copied to clipboard \u2713');closeShare();}).catch(function(){toast('Copy failed');});
@@ -527,7 +527,7 @@ function toggleFavMatch(btn,title){
   toast(btn.classList.contains('active')?'Saved: '+title:'Removed: '+title);
 }
 
-// ââ SOUNDS LIKE ââ
+// ── SOUNDS LIKE ──
 function doSoundsLike(){
   var q=document.getElementById('sl-input').value.trim();
   if(!q)return;
@@ -556,7 +556,7 @@ function doSoundsLike(){
   });
 }
 
-// ââ GRAPH ââ
+// ── GRAPH ──
 function drawGraph(d,name){
   var c=document.getElementById('gc'),ctx=c.getContext('2d');
   var W=c.offsetWidth,H=220;
@@ -581,7 +581,7 @@ function drawGraph(d,name){
   });
 }
 
-// ââ HISTORY & FAVORITES ââ
+// ── HISTORY & FAVORITES ──
 function getFaves(){try{return JSON.parse(localStorage.getItem('sohmna_faves')||'[]');}catch(e){return[];}}
 function saveFavesStore(f){try{localStorage.setItem('sohmna_faves',JSON.stringify(f));}catch(e){}}
 function addToHistory(name,dna){
@@ -610,7 +610,7 @@ function renderFaves(){
 }
 renderFaves();
 
-// ââ LOAD TREND ââ
+// ── LOAD TREND ──
 function loadTrend(s,a){
   _file={name:s,size:5e6,type:'audio/mp3'};
   document.getElementById('dicon').textContent='\u2713';
@@ -620,7 +620,7 @@ function loadTrend(s,a){
   document.getElementById('ww').classList.remove('v');toast('Loaded: '+s);
 }
 
-// ââ TABS ââ
+// ── TABS ──
 function stab(name,btn){
   document.querySelectorAll('.rtab').forEach(function(b){b.classList.remove('a');});
   document.querySelectorAll('.tp2').forEach(function(p){p.classList.remove('a');});
@@ -628,12 +628,12 @@ function stab(name,btn){
   var el=document.getElementById('tab-'+name);if(el)el.classList.add('a');
 }
 
-// ââ SEARCH ââ
+// ── SEARCH ──
 function doSearch(){
   var q=document.getElementById('search-input').value.trim();if(!q)return;
   var status=document.getElementById('search-status'),results=document.getElementById('search-results');
   status.style.display='block';status.innerHTML='<span class="spin"></span> SEARCHING...';results.innerHTML='';
-  var prompt='Expert music historian. User searching: "'+q+'". Return ONLY valid JSON:\n{"artist":"Name","description":"1-2 sentences on sample legacy.","known_for":["tag1","tag2"],"originals":[{"title":"T","artist":"A","year":"1972","reason":"Why."}],"sampled_by":[{"title":"T","artist":"A","year":"1993","reason":"Why."},{"title":"T2","artist":"A2","year":"1997","reason":"Why."}],"siblings":[{"title":"T","artist":"A","year":"1975","reason":"Similar resonance."}]}';
+  var prompt='Expert music historian. User searching: "'+q+'". Return ONLY valid JSON:\n{"artist":"Name","description":"1-2 sentences on sample legacy.","known_for":["tag1","tag2"],"originals":[{"title":"T","artist":"A","year":"1972","reason":"Why."}],"sampled_by":[{"title":"T","artist":"A","year":"1993","reason":"Why."},{"title":"T2","artist":"A2","year":"1997","reason":"Why."}],"siblings":[{"title":"T","artist":"A","year":"1975","reason":"Similar DNA."}]}';
   apiCall({messages:[{role:'user',content:prompt}]},function(err,data){
     status.style.display='none';
     if(err){results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Error: '+err.message+'</div>';return;}
@@ -657,12 +657,12 @@ function doSearch(){
       }
       addSection('SAMPLED FROM',p.originals);
       addSection('SAMPLED BY',p.sampled_by);
-      addSection('SIMILAR RESONANCE',p.siblings);
+      addSection('SIMILAR DNA',p.siblings);
     }catch(e){results.innerHTML='<div style="font-size:12px;color:var(--a2);padding:8px">Could not parse results.</div>';}
   });
 }
 
-// ââ CHAT ââ
+// ── CHAT ──
 document.getElementById('ci').addEventListener('keydown',function(e){if(e.key==='Enter')sendChat();});
 document.getElementById('csend').addEventListener('click',sendChat);
 function sendChat(){
